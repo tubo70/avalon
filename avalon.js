@@ -101,8 +101,7 @@
                 target = arguments[0] || {},
                 i = 1,
                 length = arguments.length,
-                deep = false,
-                lastArg = arguments[length - 1], mixIf = false
+                deep = false
 
         // 如果第一个参数为布尔,判定是否深拷贝
         if (typeof target === "boolean") {
@@ -110,11 +109,7 @@
             target = arguments[1] || {}
             i++
         }
-        // 如果最后一个参数为布尔，判定是否是mixIf调用
-        if(typeof lastArg === "boolean") {
-            mixIf = lastArg
-            length--
-        }
+
         //确保接受方为一个复杂的数据类型
         if (typeof target !== "object" && getType(target) !== "function") {
             target = {}
@@ -147,18 +142,14 @@
                             clone = src && avalon.isPlainObject(src) ? src : {}
                         }
 
-                        target[name] = avalon.mix(deep, clone, copy, mixIf)
-                    } else if (copy !== void 0 && (!mixIf || src === void 0)) {
+                        target[name] = avalon.mix(deep, clone, copy)
+                    } else if (copy !== void 0) {
                         target[name] = copy
                     }
                 }
             }
         }
         return target
-    }
-    avalon.mixIf = avalon.fn.mixIf = function () {
-        arguments[arguments.length++] = true
-        return avalon.mix.apply(avalon,arguments)
     }
     var eventMap = avalon.eventMap = {}
 
@@ -1017,7 +1008,6 @@
         }
         return node
     }
-    var script = DOC.createElement("script")
     avalon.parseHTML = function(html) {
         html = html.replace(rxhtml, "<$1></$2>").trim()
         var tag = (rtagName.exec(html) || ["", ""])[1].toLowerCase(),
@@ -1025,13 +1015,15 @@
                 wrap = tagHooks[tag] || tagHooks._default,
                 fragment = documentFragment.cloneNode(false),
                 wrapper = domParser,
-                firstChild, neo
+                firstChild
         if (!W3C) { //fix IE
             html = html.replace(rcreate, "<br class=fixNoscope>$1") //在link style script等标签之前添加一个补丁
         }
         wrapper.innerHTML = wrap[1] + html + (wrap[2] || "")
         var els = wrapper.getElementsByTagName("script")
         if (els.length) { //使用innerHTML生成的script节点不会发出请求与执行text属性
+            var script = DOC.createElement("script"),
+                    neo
             for (var i = 0, el; el = els[i++]; ) {
                 if (!el.type || scriptTypes[el.type]) { //如果script节点的MIME能让其执行脚本
                     neo = script.cloneNode(false) //FF不能省略参数
@@ -2511,7 +2503,9 @@
             updateModel = function() {
                 if ($elem.data("duplex-observe") !== false) {
                     if (fixType === "text") {
-                        fn(scope, element.value)
+                        if (element.checked) {
+                            fn(scope, element.value)
+                        }
                     } else {
                         var val = !element.beforeChecked
                         fn(scope, val)
