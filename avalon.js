@@ -2511,9 +2511,7 @@
             updateModel = function() {
                 if ($elem.data("duplex-observe") !== false) {
                     if (fixType === "text") {
-                        if (element.checked) {
-                            fn(scope, element.value)
-                        }
+                        fn(scope, element.value)
                     } else {
                         var val = !element.beforeChecked
                         fn(scope, val)
