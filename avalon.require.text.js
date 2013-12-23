@@ -21,7 +21,11 @@
                 }
             }
             xhr.open("GET", url, true)
-            xhr.withCredentials = true
+            if ("withCredentials" in xhr) {
+                // Check if the XMLHttpRequest object has a "withCredentials" property.
+                // "withCredentials" only exists on XMLHTTPRequest2 objects.
+                xhr.withCredentials = true
+            }
             xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest")
             xhr.send()
             return id
